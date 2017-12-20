@@ -1,0 +1,6 @@
+sensor_msgs/Image image
+---
+sensor_msgs/RegionOfInterest[] regions
+int32[] labels
+float32[] scores
+string[] names

@@ -1,0 +1,4 @@
+# http://www.selenic.com/mercurial/wiki/index.cgi/FAQ#head-2f6c20c68c1dbe9b8061b7f920ff12df20a18d10 
+# hg ignore all files except those explicitly added.
+syntax: glob
+*
