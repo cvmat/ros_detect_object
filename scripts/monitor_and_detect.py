@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import roslib
-roslib.load_manifest('my_package')
+roslib.load_manifest('detect_object')
 import sys
 import rospy
 import cv2
@@ -14,7 +14,7 @@ import chainercv
 import matplotlib
 import matplotlib.pyplot as plot
 
-import my_package.srv
+import detect_object.srv
 
 
 class image_converter:
@@ -77,7 +77,7 @@ def main(args):
     rospy.wait_for_service('detect_object')
     print("Finished.")
     detect_object_service = rospy.ServiceProxy(
-        'detect_object', my_package.srv.DetectObject)
+        'detect_object', detect_object.srv.DetectObject)
 
     input_topic = rospy.resolve_name("input")
     output_topic = rospy.resolve_name("output")

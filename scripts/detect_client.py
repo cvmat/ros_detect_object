@@ -8,7 +8,7 @@ import cv_bridge
 import argparse
 import numpy as np
 
-import my_package.srv
+import detect_object.srv
 
 bridge = cv_bridge.CvBridge()
 def detect_object_client(detect_object_service, cv_image):
@@ -33,7 +33,7 @@ if __name__ == "__main__":
 
     rospy.wait_for_service('detect_object')
     detect_object_service = rospy.ServiceProxy(
-        'detect_object', my_package.srv.DetectObject)
+        'detect_object', detect_object.srv.DetectObject)
     for filename in args.filenames:
         print "Requesting %s"%(filename)
         img = cv2.imread(filename)

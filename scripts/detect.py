@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-import roslib; roslib.load_manifest('my_package')
+import roslib; roslib.load_manifest('detect_object')
 import cv2
 import cv_bridge
 import rospy
@@ -11,7 +11,7 @@ import numpy as np
 import sys
 from chainer_npz_with_structure import load_npz_with_structure
 
-import my_package.srv
+import detect_object.srv
 
 
 
@@ -27,7 +27,7 @@ def handle_detect(req):
     #cv2.imshow("Image window", cv_image)
     #cv2.waitKey(3)
     try:
-        res = my_package.srv.DetectObjectResponse()
+        res = detect_object.srv.DetectObjectResponse()
         img_height, img_width = cv_image.shape[0:2]
         for bbox, label, score in zip(bboxes[0], labels[0], scores[0]):
             roi_param = {
@@ -48,7 +48,7 @@ def detect_object_server():
     rospy.init_node('detect_object_server',
                     xmlrpc_port=60000, tcpros_port=60001)
     s = rospy.Service('detect_object',
-                      my_package.srv.DetectObject, handle_detect)
+                      detect_object.srv.DetectObject, handle_detect)
     print "Ready to detect objects."
     rospy.spin()
 
