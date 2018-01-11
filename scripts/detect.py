@@ -55,7 +55,8 @@ def detect_object_server():
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=int, default=-1)
-    parser.add_argument('--model', default='')
+    parser.add_argument('--model', default='',
+                        help = 'a NPZ file of a trained Faster R-CNN model')
     parser.add_argument('--label_file', default='',
                         help = 'a JSON file of label names')
     args = parser.parse_args()
