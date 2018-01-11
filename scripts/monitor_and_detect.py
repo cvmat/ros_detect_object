@@ -41,9 +41,9 @@ class image_converter:
         bboxes = []
         for region in res.regions:
             bboxes.append([
-                region.x_offset, region.y_offset,
-                region.x_offset + region.width - 1,
-                region.y_offset + region.height - 1
+                region.y_offset, region.x_offset,
+                region.y_offset + region.height - 1,
+                region.x_offset + region.width - 1
             ])
         bboxes = np.array(bboxes)
         labels = np.array(res.labels)

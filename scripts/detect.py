@@ -32,9 +32,9 @@ def handle_detect(req):
         img_height, img_width = cv_image.shape[0:2]
         for bbox, label, score in zip(bboxes[0], labels[0], scores[0]):
             roi_param = {
-                'x_offset': bbox[0], 'y_offset': bbox[1],
-                'width': bbox[2] - bbox[0] + 1,
-                'height': bbox[3] - bbox[1] + 1,
+                'y_offset': bbox[0], 'x_offset': bbox[1],
+                'height': bbox[2] - bbox[0] + 1,
+                'width': bbox[3] - bbox[1] + 1,
                 'do_rectify': True
             }
             res.regions.append(sensor_msgs.msg.RegionOfInterest(**roi_param))
