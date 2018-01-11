@@ -16,6 +16,7 @@ import detect_object.srv
 
 
 def handle_detect(req):
+    global bridge, model
     cv_image = bridge.imgmsg_to_cv2(req.image, "rgb8")
     (rows,cols,channels) = cv_image.shape
     img = np.array([cv_image[:,:,0],cv_image[:,:,1],cv_image[:,:,2]])
