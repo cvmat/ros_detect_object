@@ -7,22 +7,27 @@ import sensor_msgs.msg
 
 import argparse
 import chainer
+import cupy
 import numpy as np
 import sys
 from chainer_npz_with_structure import load_npz_with_structure
 
 import detect_object.srv
 
-
+gpu_device_id = None
 
 def handle_detect(req):
-    global bridge, model
+    global bridge, model, gpu_device_id
     cv_image = bridge.imgmsg_to_cv2(req.image, "rgb8")
     (rows,cols,channels) = cv_image.shape
     img = np.array([cv_image[:,:,0],cv_image[:,:,1],cv_image[:,:,2]])
     from timeit import default_timer as timer
     start = timer()
-    bboxes, labels, scores = model.predict([img])
+    if gpu_device_id:
+        with cupy.cuda.Device(gpu_device_id):
+            bboxes, labels, scores = model.predict([img])
+    else:
+        bboxes, labels, scores = model.predict([img])
     end = timer()
     print('prediction finished. (%f [sec])' % (end - start, ))
     #cv2.imshow("Image window", cv_image)
@@ -80,8 +85,8 @@ if __name__ == "__main__":
     if args.gpu >= 0:
         print('Invoke model.to_gpu().')
         sys.stdout.flush()
-        chainer.cuda.get_device_from_id(args.gpu).use()
-        model.to_gpu()
+        gpu_device_id = args.gpu
+        model.to_gpu(gpu_device_id)
         print('Finished.')
         sys.stdout.flush()
 
