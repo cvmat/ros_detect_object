@@ -7,7 +7,6 @@ import sensor_msgs.msg
 
 import argparse
 import chainer
-import cupy
 import numpy as np
 import sys
 from chainer_npz_with_structure import load_npz_with_structure
@@ -24,6 +23,7 @@ def handle_detect(req):
     from timeit import default_timer as timer
     start = timer()
     if gpu_device_id:
+        import cupy
         with cupy.cuda.Device(gpu_device_id):
             bboxes, labels, scores = model.predict([img])
     else:
@@ -86,7 +86,9 @@ if __name__ == "__main__":
         print('Invoke model.to_gpu().')
         sys.stdout.flush()
         gpu_device_id = args.gpu
-        model.to_gpu(gpu_device_id)
+        import cupy
+        with cupy.cuda.Device(gpu_device_id):
+            model.to_gpu(gpu_device_id)
         print('Finished.')
         sys.stdout.flush()
 
