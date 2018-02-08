@@ -50,8 +50,8 @@ def handle_detect(req):
         print(e)
     return res
 
-def detect_object_server(xmlrpc_port, tcpros_port):
-    rospy.init_node('detect_object_server',
+def detect_object_server(node_name, xmlrpc_port, tcpros_port):
+    rospy.init_node(node_name,
                     xmlrpc_port=xmlrpc_port, tcpros_port=tcpros_port)
     s = rospy.Service('detect_object',
                       detect_object.srv.DetectObject, handle_detect)
@@ -63,6 +63,8 @@ if __name__ == "__main__":
     parser.add_argument('--gpu', type=int, default=-1)
     parser.add_argument('--model', default='',
                         help = 'a NPZ file of a trained Faster R-CNN model')
+    parser.add_argument('--node_name', default='detect_object_server',
+                        help = 'a node name')
     parser.add_argument('--label_file', default='',
                         help = 'a JSON file of label names')
     parser.add_argument('--xmlrpc_port', type=int, default=60000,
@@ -96,8 +98,9 @@ if __name__ == "__main__":
         print('Finished.')
         sys.stdout.flush()
 
-    print('The server listens to %d/tcp for XML-RPC and %d/tcp for services.'
+    print('Node name: %s' % (args.node_name, ))
+    print('Listen to %d/tcp for XML-RPC and %d/tcp for services.'
           % (args.xmlrpc_port, args.tcpros_port, ))
     bridge = cv_bridge.CvBridge()
-    detect_object_server(args.xmlrpc_port, args.tcpros_port)
+    detect_object_server(args.node_name, args.xmlrpc_port, args.tcpros_port)
 
