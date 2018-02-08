@@ -22,6 +22,8 @@ def detect_object_client(detect_object_service, cv_image):
 filename = None
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
+    parser.add_argument('--detection_service_name', default='detect_object',
+                        help = 'name of detection service')
     parser.add_argument('--display', action='store_true',
                         help='display images')
     parser.add_argument('filenames', metavar='FILE', nargs='+',
@@ -31,9 +33,11 @@ if __name__ == "__main__":
         import chainercv
         import matplotlib
 
-    rospy.wait_for_service('detect_object')
+    print('Waiting for the service "%s"...' % (args.detection_service_name,))
+    rospy.wait_for_service(args.detection_service_name)
     detect_object_service = rospy.ServiceProxy(
-        'detect_object', detect_object.srv.DetectObject)
+        args.detection_service_name, detect_object.srv.DetectObject)
+    print('Connected to the service "%s".' % (args.detection_service_name,))
     for filename in args.filenames:
         print "Requesting %s"%(filename)
         img = cv2.imread(filename)
