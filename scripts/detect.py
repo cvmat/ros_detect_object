@@ -61,16 +61,16 @@ def detect_object_server(node_name, xmlrpc_port, tcpros_port):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument('--gpu', type=int, default=-1)
-    parser.add_argument('--model', default='',
-                        help = 'a NPZ file of a trained Faster R-CNN model')
-    parser.add_argument('--node_name', default='detect_object_server',
-                        help = 'a node name')
     parser.add_argument('--label_file', default='',
-                        help = 'a JSON file of label names')
-    parser.add_argument('--xmlrpc_port', type=int, default=60000,
-                        help = 'a port for XML-RPC')
+                        help = 'JSON file of label names')
+    parser.add_argument('--model', default='',
+                        help = 'NPZ file of a trained Faster R-CNN model')
+    parser.add_argument('--node_name', default='detect_object_server',
+                        help = 'node name')
     parser.add_argument('--tcpros_port', type=int, default=60001,
-                        help = 'a port for services')
+                        help = 'port for services')
+    parser.add_argument('--xmlrpc_port', type=int, default=60000,
+                        help = 'port for XML-RPC')
     args = parser.parse_args()
 
     print('Load %s...' % (args.model,))
