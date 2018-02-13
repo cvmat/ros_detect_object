@@ -78,12 +78,15 @@ def main(args):
     sys.stdout.flush()
     detect_object_service = rospy.ServiceProxy(
         'detect_object', detect_object.srv.DetectObject)
-    input_topic = rospy.resolve_name("input")
-    output_topic = rospy.resolve_name("output")
-    ic = image_converter(input_topic, output_topic, detect_object_service)
     print("Invoke rospy.init_node().")
     sys.stdout.flush()
     rospy.init_node('monitor_and_detect', anonymous=True)
+    input_topic = rospy.resolve_name("input")
+    output_topic = rospy.resolve_name("output")
+    print("input_topic: %s" % (input_topic,))
+    print("output_topic: %s" % (output_topic,))
+    sys.stdout.flush()
+    ic = image_converter(input_topic, output_topic, detect_object_service)
     try:
         print("Invoke rospy.spin().")
         sys.stdout.flush()
