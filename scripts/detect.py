@@ -30,6 +30,7 @@ def handle_detect(req):
         bboxes, labels, scores = model.predict([img])
     end = timer()
     print('prediction finished. (%f [sec])' % (end - start, ))
+    sys.stdout.flush()
     #cv2.imshow("Image window", cv_image)
     #cv2.waitKey(3)
     try:
@@ -51,11 +52,16 @@ def handle_detect(req):
     return res
 
 def detect_object_server(node_name, detection_service_name, xmlrpc_port, tcpros_port):
+    print('Invoke rospy.init_node().')
+    sys.stdout.flush()
     rospy.init_node(node_name,
                     xmlrpc_port=xmlrpc_port, tcpros_port=tcpros_port)
+    print('Invoke rospy.Service().')
+    sys.stdout.flush()
     s = rospy.Service(detection_service_name,
                       detect_object.srv.DetectObject, handle_detect)
     print "Ready to detect objects."
+    sys.stdout.flush()
     rospy.spin()
 
 if __name__ == "__main__":
