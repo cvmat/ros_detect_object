@@ -18,10 +18,17 @@ args = parser.parse_args()
 print("Prepare the pretrained model.")
 model = make_serializable_object(
     FasterRCNNVGG16,
-    {
+    constructor_args = {
         'n_fg_class': len(voc_bbox_label_names),
         'pretrained_model': args.pretrained_model,
-    })
+    },
+    template_args = {
+        # Do not retrieve the pre-trained model again on generating a
+        # template object for loading weights in a file.
+        'n_fg_class': len(voc_bbox_label_names),
+        'pretrained_model': None,
+    }
+)
 
 print("Save the pretrained model as '%s', which can be loaded by 'chainer_npz_with_structure.load_npz_with_structure()'." % (args.output_model,))
 save_npz_with_structure(args.output_model, model)
