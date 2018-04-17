@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 import argparse
 import json
+import sys
 from chainercv.datasets import voc_bbox_label_names
 from chainercv.links import FasterRCNNVGG16
 
@@ -15,7 +16,8 @@ parser.add_argument('--pretrained_model', default='voc07',
 )
 args = parser.parse_args()
 
-print("Prepare the pretrained model.")
+print("Preparing the pretrained model...")
+sys.stdout.flush()
 model = make_serializable_object(
     FasterRCNNVGG16,
     constructor_args = {
@@ -29,14 +31,21 @@ model = make_serializable_object(
         'pretrained_model': None,
     }
 )
+print("Finished.")
+sys.stdout.flush()
 
-print("Save the pretrained model as '%s', which can be loaded by 'chainer_npz_with_structure.load_npz_with_structure()'." % (args.output_model,))
+print("Saving the pretrained model as '%s', which can be loaded by 'chainer_npz_with_structure.load_npz_with_structure()'..." % (args.output_model,))
 save_npz_with_structure(args.output_model, model)
+print("Finished.")
+sys.stdout.flush()
 
-print("Save the label file as '%s'." % (args.output_json,))
+print("Saving the label file as '%s'." % (args.output_json,))
 d = dict()
 for n, name in enumerate(voc_bbox_label_names):
     d[n] = name
 
 with open(args.output_json, 'w') as fp:
     json.dump(d, fp, indent=4)
+
+print("Finished.")
+sys.stdout.flush()
