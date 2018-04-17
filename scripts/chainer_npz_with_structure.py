@@ -109,24 +109,28 @@ def _restore_obj_from_construction_info_string(str, class_name_replacement_list 
         raise ValueError()
     return obj
 
-def make_serializable_object(class_object, constructor_args):
+def make_serializable_object(class_object, constructor_args, template_args=None):
     """
     Generate an object and attach the argument of the constructor to
     to the object.
 
     Parameters
     ----------
-    class_object : a class object
-    constructor_args : a dict
+    class_object : class object
+    constructor_args : dict
+        Arguments used for generating an object of the given class.
+    template_args : dict
+        Arguments used for generating a template of an object of the
+        given class in advance of loading trained weights.
 
     Returns
     -------
     obj : object
         It has an additional attribute `_constructor_args` that refers
-        to constructor_args.
+        to template_args or constructor_args.
     """
     obj = class_object(**constructor_args)
-    obj._constructor_args = constructor_args
+    obj._constructor_args = template_args or constructor_args
     return obj
 
 def save_npz_with_structure(file, obj, compression=True):
@@ -253,7 +257,13 @@ if __name__ == '__main__':
     # You should initialize a `chainer.Link` object by
     # `make_serializable_object` if it is referred in arguments
     # of the constructor.
-    predictor = make_serializable_object(L.Linear, {'in_size': 5, 'out_size': 4})
+    predictor = make_serializable_object(
+        L.Linear, {'in_size': 5, 'out_size': 4},
+        template_args = {
+            'in_size': 5, 'out_size': 4,
+            'initialW': 100, 'initial_bias': -1000,
+        }
+    )
     model1 = make_serializable_object(L.Classifier, {
         'predictor': predictor, 'lossfun': lossfun })
     #
