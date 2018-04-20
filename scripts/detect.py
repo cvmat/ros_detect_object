@@ -79,7 +79,7 @@ if __name__ == "__main__":
                         help = 'port for services')
     parser.add_argument('--xmlrpc_port', type=int, default=60000,
                         help = 'port for XML-RPC')
-    args = parser.parse_args()
+    args = parser.parse_args(rospy.myargv(argv=sys.argv)[1:])
 
     print('Load %s...' % (args.model,))
     sys.stdout.flush()

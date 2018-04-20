@@ -14,7 +14,7 @@ parser.add_argument('--output_json', default='faster-rcnn-vgg16-voc07.json')
 parser.add_argument('--pretrained_model', default='voc07',
                     help = 'the pretrained model. See http://chainercv.readthedocs.io/en/stable/reference/links/faster_rcnn.html '
 )
-args = parser.parse_args()
+args = parser.parse_args(rospy.myargv(argv=sys.argv)[1:])
 
 print("Preparing the pretrained model...")
 sys.stdout.flush()

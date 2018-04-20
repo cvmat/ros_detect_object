@@ -28,7 +28,7 @@ if __name__ == "__main__":
                         help='display images')
     parser.add_argument('filenames', metavar='FILE', nargs='+',
                         help='a filename of a image')
-    args = parser.parse_args()
+    args = parser.parse_args(rospy.myargv(argv=sys.argv)[1:])
     if args.display:
         import chainercv
         import matplotlib
