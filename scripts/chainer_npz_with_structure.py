@@ -168,10 +168,14 @@ def load_npz_with_structure(file, path = '', strict = True, class_name_replaceme
     Parameters
     ----------
     file : file-like object, string, or pathlib.Path
+    path : string, optional
+        The base path that the deserialization starts from.
+        This is sent to ``chainer.serializers.NpzDeserializer`` as is.
     strict : bool, optional
         If ``True``, the deserializer raises an error when an
         expected value is not found in the given NPZ file. Otherwise,
         it ignores the value and skip deserialization.
+        This is sent to ``chainer.serializers.NpzDeserializer`` as is.
     class_name_replacement_list : list
         A list of a tuple of pattern and replacement.
         If the class name written in the file matches a pattern in the list,
