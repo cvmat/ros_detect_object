@@ -22,7 +22,7 @@ def handle_detect(req):
     img = np.array([cv_image[:,:,0],cv_image[:,:,1],cv_image[:,:,2]])
     from timeit import default_timer as timer
     start = timer()
-    if gpu_device_id:
+    if not (gpu_device_id is None):
         import cupy
         with cupy.cuda.Device(gpu_device_id):
             bboxes, labels, scores = model.predict([img])
