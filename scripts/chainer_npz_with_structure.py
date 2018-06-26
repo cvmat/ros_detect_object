@@ -200,6 +200,44 @@ def load_npz_with_structure(file, path = '', strict = True, class_name_replaceme
         d.load(obj)
     return obj
 
+
+def modify_constructor_args_embedded_in_npz(input_file, output_file, new_constructor_args, path = '', strict = True, class_name_replacement_list = None):
+    """
+    Modify constructor args of a model from a ``.npz`` file and save it to the other file.
+
+    Parameters
+    ----------
+    input_file : file-like object, string, or pathlib.Path
+    output_file : file-like object, string, or pathlib.Path
+    new_constructor_args : dict
+        Arguments used for generating an object of the given class.
+        It will be used when loading a model from the file specified
+        by ``output_file``.
+    path : string, optional
+        The base path that the deserialization starts from.
+        This is sent to ``chainer.serializers.NpzDeserializer`` as is.
+    strict : bool, optional
+        If ``True``, the deserializer raises an error when an
+        expected value is not found in the given NPZ file. Otherwise,
+        it ignores the value and skip deserialization.
+        This is sent to ``chainer.serializers.NpzDeserializer`` as is.
+    class_name_replacement_list : list
+        A list of a tuple of pattern and replacement.
+        If the class name written in the file matches a pattern in the list,
+        the class name is replaced by the replacement.
+        The patterns are compared in the order of the list and only
+        the first replacement will be applied.
+
+    Returns
+    -------
+    obj : object
+        The loaded object.
+    """
+    obj = load_npz_with_structure(input_file)
+    obj._constructor_args = new_constructor_args
+    save_npz_with_structure(output_file, obj)
+    return obj
+
 # Example usage
 if __name__ == '__main__':
     import chainer
