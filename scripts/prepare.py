@@ -56,6 +56,20 @@ elif args.model == 'yolo_v2':
             'pretrained_model': None,
         }
     )
+elif args.model == 'yolo_v3':
+    model = make_serializable_object(
+        chainercv.links.YOLOv3,
+        constructor_args = {
+            'n_fg_class': len(voc_bbox_label_names),
+            'pretrained_model': args.pretrained_model,
+        },
+        template_args = {
+            # Do not retrieve the pre-trained model again on generating a
+            # template object for loading weights in a file.
+            'n_fg_class': len(voc_bbox_label_names),
+            'pretrained_model': None,
+        }
+    )
 
 #
 print("Finished.")
