@@ -20,6 +20,7 @@ def handle_detect(req):
     cv_image = bridge.imgmsg_to_cv2(req.image, "rgb8")
     (rows,cols,channels) = cv_image.shape
     img = np.array([cv_image[:,:,0],cv_image[:,:,1],cv_image[:,:,2]])
+    img = img.astype(np.float32)
     from timeit import default_timer as timer
     start = timer()
     if not (gpu_device_id is None):
@@ -87,7 +88,10 @@ if __name__ == "__main__":
     print('Finished.')
     sys.stdout.flush()
 
-    label_names = ['label%d' % n for n in range(model.n_class - 1)]
+    if 'n_fg_class' in dir(model):
+        label_names = ['label%d' % n for n in range(model.n_fg_class)]
+    else:
+        label_names = ['label%d' % n for n in range(model.n_class - 1)]
     if args.label_file != '':
         import json
         with open(args.label_file, 'r') as fp:
