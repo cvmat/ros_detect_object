@@ -2,13 +2,15 @@
 import argparse
 import json
 import sys
-from chainercv.datasets import voc_bbox_label_names
-from chainercv.links import FasterRCNNVGG16
 
+import chainercv
+from chainercv.datasets import voc_bbox_label_names
 from chainer_npz_with_structure import make_serializable_object
 from chainer_npz_with_structure import save_npz_with_structure
 
 parser = argparse.ArgumentParser()
+parser.add_argument('--model', choices=('faster_rcnn', 'yolo_v2', 'yolo_v3'),
+                    default='faster_rcnn')
 parser.add_argument('--output_model', default='faster-rcnn-vgg16-voc07.npz')
 parser.add_argument('--output_json', default='faster-rcnn-vgg16-voc07.json')
 parser.add_argument('--pretrained_model', default='voc07',
@@ -26,19 +28,36 @@ args = parser.parse_args(parsed_args[1:])
 
 print("Preparing the pretrained model...")
 sys.stdout.flush()
-model = make_serializable_object(
-    FasterRCNNVGG16,
-    constructor_args = {
-        'n_fg_class': len(voc_bbox_label_names),
-        'pretrained_model': args.pretrained_model,
-    },
-    template_args = {
-        # Do not retrieve the pre-trained model again on generating a
-        # template object for loading weights in a file.
-        'n_fg_class': len(voc_bbox_label_names),
-        'pretrained_model': None,
-    }
-)
+if args.model == 'faster_rcnn':
+    model = make_serializable_object(
+        chainercv.links.FasterRCNNVGG16,
+        constructor_args = {
+            'n_fg_class': len(voc_bbox_label_names),
+            'pretrained_model': args.pretrained_model,
+        },
+        template_args = {
+            # Do not retrieve the pre-trained model again on generating a
+            # template object for loading weights in a file.
+            'n_fg_class': len(voc_bbox_label_names),
+            'pretrained_model': None,
+        }
+    )
+elif args.model == 'yolo_v2':
+    model = make_serializable_object(
+        chainercv.links.YOLOv2,
+        constructor_args = {
+            'n_fg_class': len(voc_bbox_label_names),
+            'pretrained_model': args.pretrained_model,
+        },
+        template_args = {
+            # Do not retrieve the pre-trained model again on generating a
+            # template object for loading weights in a file.
+            'n_fg_class': len(voc_bbox_label_names),
+            'pretrained_model': None,
+        }
+    )
+
+#
 print("Finished.")
 sys.stdout.flush()
 
