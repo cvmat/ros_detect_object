@@ -38,6 +38,9 @@ def handle_detect(req):
         res = detect_object.srv.DetectObjectResponse()
         img_height, img_width = cv_image.shape[0:2]
         for bbox, label, score in zip(bboxes[0], labels[0], scores[0]):
+            # Ensure that x_offset and y_offset are not negative.
+            bbox[0] = max(0, bbox[0])
+            bbox[1] = max(0, bbox[1])
             roi_param = {
                 'y_offset': bbox[0], 'x_offset': bbox[1],
                 'height': bbox[2] - bbox[0] + 1,
