@@ -1,3 +1,7 @@
+#!/usr/bin/env python
+#
+# Based on https://github.com/chainer/chainercv/blob/master/examples/yolo/darknet2npz.py
+#
 import argparse
 import numpy as np
 
@@ -5,10 +9,11 @@ import chainer
 from chainer.links import Convolution2D
 from chainer import serializers
 
+import chainercv
 from chainercv.links import Conv2DBNActiv
-from chainercv.links import YOLOv2
-from chainercv.links import YOLOv3
 
+from chainer_npz_with_structure import make_serializable_object
+from chainer_npz_with_structure import save_npz_with_structure
 
 def load_param(file, param):
     if isinstance(param, chainer.Variable):
@@ -69,9 +74,19 @@ def main():
     args = parser.parse_args()
 
     if args.model == 'yolo_v2':
-        model = YOLOv2(n_fg_class=args.n_fg_class)
+        model = make_serializable_object(
+            chainercv.links.YOLOv2,
+            constructor_args = {
+                'n_fg_class': args.n_fg_class,
+            }
+        )
     elif args.model == 'yolo_v3':
-        model = YOLOv3(n_fg_class=args.n_fg_class)
+        model = make_serializable_object(
+            chainercv.links.YOLOv3,
+            constructor_args = {
+                'n_fg_class': args.n_fg_class,
+            }
+        )
 
     with chainer.using_config('train', False):
         model(np.empty((1, 3, model.insize, model.insize), dtype=np.float32))
@@ -88,7 +103,7 @@ def main():
         elif args.model == 'yolo_v3':
             load_yolo_v3(f, model)
 
-    serializers.save_npz(args.output, model)
+    save_npz_with_structure(args.output, model)
 
 
 if __name__ == '__main__':
