@@ -19,6 +19,33 @@ def detect_object_client(detect_object_service, cv_image):
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
 
+def visualize_result_onto(cv_image, result):
+    for n, region in enumerate(result.regions):
+        x0 = region.x_offset
+        y0 = region.y_offset
+        x1 = region.x_offset + region.width - 1
+        y1 = region.y_offset + region.height - 1
+        cv2.rectangle(cv_image, (x0, y0), (x1, y1), (0, 0, 255), 2)
+        label_str = '%.2f: %s' % (result.scores[n], result.names[n])
+        text_config = {
+            'text': label_str,
+            'fontFace': cv2.FONT_HERSHEY_PLAIN,
+            'fontScale': 1,
+            'thickness': 1,
+        }
+        size, baseline = cv2.getTextSize(**text_config)
+        cv2.rectangle(
+            cv_image, (x0, y0), (x0 + size[0], y0 + size[1]),
+            (255, 255, 255), cv2.FILLED
+        )
+        cv2.putText(
+            cv_image,
+            org = (x0, y0 + size[1]),
+            color = (255, 0, 0),
+            **text_config
+        )
+    return cv_image
+
 filename = None
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
@@ -29,9 +56,6 @@ if __name__ == "__main__":
     parser.add_argument('filenames', metavar='FILE', nargs='+',
                         help='a filename of a image')
     args = parser.parse_args(rospy.myargv(argv=sys.argv)[1:])
-    if args.display:
-        import chainercv
-        import matplotlib
 
     print('Waiting for the service "%s"...' % (args.detection_service_name,))
     rospy.wait_for_service(args.detection_service_name)
@@ -69,21 +93,12 @@ if __name__ == "__main__":
             labels = np.array(res.labels)
             scores = np.array(res.scores)
             names = np.array(res.names)
-            #
-            # Prepare `label_names` for `chainercv.visualizations.vis_bbox()`
-            # that assumes that `label_names` includes all label names.
-            #
-            max_label = 0
-            if 0 < len(labels):
-                max_label = labels.max()
-            label_names = [''] * (1 + max_label)
-            for label_id, label_name in zip(labels, names):
-                label_names[label_id] = label_name
-            #
-            #
-            np_img = np.array([img[:,:,2],img[:,:,1],img[:,:,0]])
-            chainercv.visualizations.vis_bbox(
-                np_img, bboxes, labels, scores, label_names=label_names)
+            visualize_result_onto(img, res)
+            cv2.imshow(filename, img)
     if args.display:
-        matplotlib.pyplot.show()
-
+        print('Press any key on an image window to finish the program.')
+        while True:
+            k = cv2.waitKey(1000)
+            if k != -1:
+                cv2.destroyAllWindows()
+                break
