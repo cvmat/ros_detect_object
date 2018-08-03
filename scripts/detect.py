@@ -79,10 +79,10 @@ if __name__ == "__main__":
                         help = 'NPZ file of a trained Faster R-CNN model')
     parser.add_argument('--node_name', default='detect_object_server',
                         help = 'node name')
-    parser.add_argument('--tcpros_port', type=int, default=60001,
-                        help = 'port for services')
-    parser.add_argument('--xmlrpc_port', type=int, default=60000,
-                        help = 'port for XML-RPC')
+    parser.add_argument('--tcpros_port', type=int, default=0,
+                        help = 'port for services (default: auto)')
+    parser.add_argument('--xmlrpc_port', type=int, default=0,
+                        help = 'port for XML-RPC (default: auto)')
     args = parser.parse_args(rospy.myargv(argv=sys.argv)[1:])
 
     print('Load %s...' % (args.model,))
@@ -115,8 +115,9 @@ if __name__ == "__main__":
 
     print('Node name: %s' % (args.node_name, ))
     print('Detection service name: %s' % (args.detection_service_name, ))
-    print('Listen to %d/tcp for XML-RPC and %d/tcp for services.'
+    print('Listen to %s/tcp for XML-RPC and %s/tcp for services.'
           % (args.xmlrpc_port, args.tcpros_port, ))
+    print('(0 means that a port will be automatically determined.)')
     bridge = cv_bridge.CvBridge()
     detect_object_server(
         args.node_name, args.detection_service_name,
