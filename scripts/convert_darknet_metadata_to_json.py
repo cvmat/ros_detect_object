@@ -28,7 +28,7 @@ if __name__ == "__main__":
     lib = ctypes.CDLL(args.darknet_library, ctypes.RTLD_GLOBAL)
     lib.get_metadata.argtypes = [ctypes.c_char_p]
     lib.get_metadata.restype = METADATA
-    meta = lib.get_metadata("./cfg/coco.data")
+    meta = lib.get_metadata(args.input_metadata)
 
     print("Saving the label file as '%s'." % (args.output_json,))
     d = dict()
