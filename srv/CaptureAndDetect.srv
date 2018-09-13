@@ -1,0 +1,11 @@
+string topic
+duration capture_timeout
+bool return_image_data
+---
+bool success
+string error_msg
+sensor_msgs/Image image
+sensor_msgs/RegionOfInterest[] regions
+int32[] labels
+float32[] scores
+string[] names
