@@ -16,7 +16,7 @@ import detect_object.srv
 import util
 
 class image_converter:
-    def __init__(self, input_topic, output_topic, detect_object_service):
+    def __init__(self, input_topic, output_topic, detect_object_service, label_format):
         self.detect_object_service = detect_object_service
         self.image_pub = rospy.Publisher(
             output_topic, sensor_msgs.msg.Image, queue_size=10)
@@ -24,6 +24,7 @@ class image_converter:
         self.image_sub = rospy.Subscriber(
             input_topic, sensor_msgs.msg.Image,
             self.callback)
+        self.label_format = label_format
 
     def callback(self, data):
         try:
@@ -38,7 +39,7 @@ class image_converter:
             return
 
         cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-        util.visualize_result_onto(cv_image, res)
+        util.visualize_result_onto(cv_image, res, self.label_format)
         try:
             self.image_pub.publish(
                 self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
@@ -59,10 +60,11 @@ def main(args):
     rospy.init_node('monitor_and_detect', anonymous=True)
     input_topic = rospy.resolve_name("input")
     output_topic = rospy.resolve_name("output")
+    label_format = rospy.get_param('~label_format', '%(score).2f: %(name)s')
     print("input_topic: %s" % (input_topic,))
     print("output_topic: %s" % (output_topic,))
     sys.stdout.flush()
-    ic = image_converter(input_topic, output_topic, detect_object_service)
+    ic = image_converter(input_topic, output_topic, detect_object_service, label_format)
     try:
         print("Invoke rospy.spin().")
         sys.stdout.flush()
