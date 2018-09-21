@@ -17,6 +17,8 @@ if __name__ == "__main__":
     parser.add_argument('--service_name', default='capture_and_detect',
                         help = 'name of "capture_and_detect" service')
     parser.add_argument('--topic', default='', help = 'source topic')
+    parser.add_argument('--label_format', default='%(score).2f: %(name)s',
+                        help = 'format of a label text in visualized result')
     parser.add_argument('--display', action='store_true',
                         help='display images')
     args = parser.parse_args(rospy.myargv(argv=sys.argv)[1:])
@@ -73,7 +75,7 @@ if __name__ == "__main__":
         names = np.array(res.names)
         bridge = cv_bridge.CvBridge()
         cv_image = bridge.imgmsg_to_cv2(res.image, "bgr8")
-        util.visualize_result_onto(cv_image, res)
+        util.visualize_result_onto(cv_image, res, args.label_format)
         cv2.imshow(filename, cv_image)
 
     if args.display:
