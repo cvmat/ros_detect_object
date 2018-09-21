@@ -13,6 +13,7 @@ import numpy as np
 import chainercv
 
 import detect_object.srv
+import util
 
 class image_converter:
     def __init__(self, input_topic, output_topic, detect_object_service):
@@ -37,32 +38,7 @@ class image_converter:
             return
 
         cv_image = self.bridge.imgmsg_to_cv2(data, "bgr8")
-        for n, region in enumerate(res.regions):
-            x0 = region.x_offset
-            y0 = region.y_offset
-            x1 = region.x_offset + region.width - 1
-            y1 = region.y_offset + region.height - 1
-            cv2.rectangle(cv_image, (x0, y0), (x1, y1), (0, 0, 255), 2)
-            label_str = '%.2f: %s' % (res.scores[n], res.names[n])
-            text_config = {
-                'text': label_str,
-                'fontFace': cv2.FONT_HERSHEY_PLAIN,
-                'fontScale': 1,
-                'thickness': 1,
-            }
-            size, baseline = cv2.getTextSize(**text_config)
-            cv2.rectangle(
-                cv_image, (x0, y0), (x0 + size[0], y0 + size[1]),
-                (255, 255, 255), cv2.FILLED
-            )
-            cv2.putText(
-                cv_image,
-                org = (x0, y0 + size[1]),
-                color = (255, 0, 0),
-                **text_config
-            )
-        #cv2.imshow("Image window", cv_image)
-        #cv2.waitKey(3)
+        util.visualize_result_onto(cv_image, res)
         try:
             self.image_pub.publish(
                 self.bridge.cv2_to_imgmsg(cv_image, "bgr8")
