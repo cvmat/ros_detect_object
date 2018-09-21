@@ -1,15 +1,17 @@
 import cv2
 
-def visualize_result_onto(cv_image, result):
+def visualize_result_onto(cv_image, result, label_format='%(score).2f: %(name)s'):
     for n, region in enumerate(result.regions):
         x0 = region.x_offset
         y0 = region.y_offset
         x1 = region.x_offset + region.width - 1
         y1 = region.y_offset + region.height - 1
         cv2.rectangle(cv_image, (x0, y0), (x1, y1), (0, 0, 255), 2)
-        label_str = '%.2f: %s' % (result.scores[n], result.names[n])
+        label_text = label_format % {
+            'score': result.scores[n], 'name': result.names[n]
+        }
         text_config = {
-            'text': label_str,
+            'text': label_text,
             'fontFace': cv2.FONT_HERSHEY_PLAIN,
             'fontScale': 1,
             'thickness': 1,
