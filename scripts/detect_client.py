@@ -9,6 +9,7 @@ import argparse
 import numpy as np
 
 import detect_object.srv
+import util
 
 bridge = cv_bridge.CvBridge()
 def detect_object_client(detect_object_service, cv_image):
@@ -18,33 +19,6 @@ def detect_object_client(detect_object_service, cv_image):
         return res
     except rospy.ServiceException, e:
         print "Service call failed: %s"%e
-
-def visualize_result_onto(cv_image, result):
-    for n, region in enumerate(result.regions):
-        x0 = region.x_offset
-        y0 = region.y_offset
-        x1 = region.x_offset + region.width - 1
-        y1 = region.y_offset + region.height - 1
-        cv2.rectangle(cv_image, (x0, y0), (x1, y1), (0, 0, 255), 2)
-        label_str = '%.2f: %s' % (result.scores[n], result.names[n])
-        text_config = {
-            'text': label_str,
-            'fontFace': cv2.FONT_HERSHEY_PLAIN,
-            'fontScale': 1,
-            'thickness': 1,
-        }
-        size, baseline = cv2.getTextSize(**text_config)
-        cv2.rectangle(
-            cv_image, (x0, y0), (x0 + size[0], y0 + size[1]),
-            (255, 255, 255), cv2.FILLED
-        )
-        cv2.putText(
-            cv_image,
-            org = (x0, y0 + size[1]),
-            color = (255, 0, 0),
-            **text_config
-        )
-    return cv_image
 
 filename = None
 if __name__ == "__main__":
@@ -93,7 +67,7 @@ if __name__ == "__main__":
             labels = np.array(res.labels)
             scores = np.array(res.scores)
             names = np.array(res.names)
-            visualize_result_onto(img, res)
+            util.visualize_result_onto(img, res)
             cv2.imshow(filename, img)
     if args.display:
         print('Press any key on an image window to finish the program.')
