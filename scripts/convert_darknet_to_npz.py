@@ -89,20 +89,59 @@ def update_format_of_darknet_model(output_filename, input_filename, darknet_libr
     return True
 
 def load_darknet_model(filename, model_type, number_of_foreground_classes, retry_with_update_if_possible=False, darknet_library='libdarknet.so',  darknet_cfg_filename=''):
+    # Extract information of anchors.
+    anchor_info = None
+    with open(darknet_cfg_filename, 'r') as fp:
+        line = iter(fp.readline, '')
+        while True:
+            try:
+                current = line.next()
+            except StopIteration:
+                break
+
+            if current.lstrip(' ').startswith('anchors'):
+                try:
+                    anchor_info = [
+                        float(s) for s
+                        in current.split('=')[1].split(',')
+                    ]
+                except ValueError:
+                    print(
+                        'Failed to extract numbers from the line [%s]'
+                        % (current,)
+                    )
+                    raise
+                break
+    overwritten_class_variables = None
+    if anchor_info != None:
+        assert(len(anchor_info) % 2 == 0)
+        anchors = []
+        for n in range(len(anchor_info) / 2):
+            width = anchor_info[2 * n]
+            height = anchor_info[2 * n + 1]
+            anchors.append((height, width))
+        overwritten_class_variables = {
+            '_anchors': tuple(anchors)
+        }
+        print('anchors: %s' % (tuple(anchors)),))
+
     if model_type == 'yolo_v2':
         model = make_serializable_object(
             chainercv.links.YOLOv2,
             constructor_args = {
                 'n_fg_class': number_of_foreground_classes,
-            }
+            },
+            overwritten_class_variables = overwritten_class_variables
         )
     elif model_type == 'yolo_v3':
         model = make_serializable_object(
             chainercv.links.YOLOv3,
             constructor_args = {
                 'n_fg_class': number_of_foreground_classes,
-            }
+            },
+            overwritten_class_variables = overwritten_class_variables
         )
+
 
     with chainer.using_config('train', False):
         model(np.empty((1, 3, model.insize, model.insize), dtype=np.float32))
@@ -183,7 +222,7 @@ def main():
         input_model_filename, args.model_type, args.n_fg_class,
         retry_with_update_if_possible=True,
         darknet_library=args.darknet_library,
-        darknet_cfg_filename=args.input_darknet_cfg,
+        darknet_cfg_filename=input_cfg_filename,
     )
     if model:
         print('Saving a darknet model to "%s".' % (output_filename, ))
