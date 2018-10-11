@@ -191,7 +191,8 @@ def load_darknet_model(filename, model_type, number_of_foreground_classes, retry
                 sys.stdout.flush()
                 model = load_darknet_model(
                     tmp_path, model_type, number_of_foreground_classes,
-                    retry_with_update_if_possible=False
+                    retry_with_update_if_possible=False,
+                    darknet_cfg_filename=darknet_cfg_filename
                 )
             else:
                 print('Failed to convert "%s".' % (filename,))
