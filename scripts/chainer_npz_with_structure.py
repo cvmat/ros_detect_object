@@ -50,6 +50,8 @@ def _convert_construction_info_to_string(obj):
         else:
             encoded_constructor_args[k] = v
     info['_encoded_constructor_args'] = encoded_constructor_args
+    if hasattr(obj, '_overwritten_class_variables'):
+        info['_overwritten_class_variables'] = obj._overwritten_class_variables
     numpy.save(output, arr=info)
     encoded_construction_info = 'OBJ' + output.getvalue()
     output.close()
@@ -104,12 +106,20 @@ def _restore_obj_from_construction_info_string(str, class_name_replacement_list 
                     full_class_name = re.sub(pat, repl, full_class_name)
                     break
         class_object = import_class_from_string(full_class_name)
-        obj = make_serializable_object(class_object, constructor_args)
+        overwritten_class_variables = None
+        if '_overwritten_class_variables' in info:
+            overwritten_class_variables = info['_overwritten_class_variables']
+            for name, value in overwritten_class_variables.items():
+                setattr(class_object, name, value)
+        obj = make_serializable_object(
+            class_object, constructor_args,
+            overwritten_class_variables = overwritten_class_variables
+        )
     else:
         raise ValueError()
     return obj
 
-def make_serializable_object(class_object, constructor_args, template_args=None):
+def make_serializable_object(class_object, constructor_args, template_args=None, overwritten_class_variables=None):
     """
     Generate an object and attach the argument of the constructor to
     to the object.
@@ -119,9 +129,13 @@ def make_serializable_object(class_object, constructor_args, template_args=None)
     class_object : class object
     constructor_args : dict
         Arguments used for generating an object of the given class.
-    template_args : dict
+    template_args : dict, optional
         Arguments used for generating a template of an object of the
         given class in advance of loading trained weights.
+    overwritten_class_variables : dict, optional
+        A dict of class variables and values substituded before object
+        aconstruction.
+        Each value must be a simple object that `pickle` can serialize.
 
     Returns
     -------
@@ -131,9 +145,11 @@ def make_serializable_object(class_object, constructor_args, template_args=None)
     """
     obj = class_object(**constructor_args)
     obj._constructor_args = template_args or constructor_args
+    if overwritten_class_variables != None:
+        obj._overwritten_class_variables = overwritten_class_variables
     return obj
 
-def save_npz_with_structure(file, obj, compression=True):
+def save_npz_with_structure(file, obj, compression=True, overwritten_class_variables=None):
     """
     Save an object to the file in NPZ format.
 
@@ -146,7 +162,13 @@ def save_npz_with_structure(file, obj, compression=True):
         generating the object.
     compression : bool, optional
         If ``True``, the object is saved in compressed .npz format.
+    overwritten_class_variables : dict, optional
+        A dict of class variables and values substituded before object
+        aconstruction.
+        Each value must be a simple object that `pickle` can serialize.
     """
+    if overwritten_class_variables != None:
+        obj._overwritten_class_variables = overwritten_class_variables
     s = chainer.serializers.npz.DictionarySerializer()
     s.save(obj)
     if not hasattr(obj, '_constructor_args'):
@@ -339,4 +361,29 @@ if __name__ == '__main__':
           'respectively.')
     print('norm of (oups1 - oups2) = %e' % np.linalg.norm(oups1 - oups2))
     print('norm of (oups1 - oups3) = %e' % np.linalg.norm(oups1 - oups3))
-
+    #
+    #
+    # Overwritten class variables
+    model4 = make_serializable_object(
+        L.Linear, {'in_size': 3, 'out_size': 3},
+        overwritten_class_variables = {'name': 'EXAMPLE'}
+    )
+    save_npz_with_structure(filename, model4)
+    #
+    model4_reloaded = load_npz_with_structure(filename)
+    print('model4_reloaded.name = "%s".' % (model4_reloaded.name,))
+    print('L.Linear.name = "%s".' % (L.Linear.name,))
+    #
+    # The overwritten class vairables can be specified when
+    # calling `save_npz_with_structure`.
+    model5 = make_serializable_object(
+        L.Linear, {'in_size': 3, 'out_size': 3},
+    )
+    save_npz_with_structure(
+        filename, model5,
+        overwritten_class_variables = {'name': 'EXAMPLE2'}
+    )
+    #
+    model5_reloaded = load_npz_with_structure(filename)
+    print('model5_reloaded.name = "%s".' % (model5_reloaded.name,))
+    print('L.Linear.name = "%s".' % (L.Linear.name,))
