@@ -123,7 +123,7 @@ def load_darknet_model(filename, model_type, number_of_foreground_classes, retry
         overwritten_class_variables = {
             '_anchors': tuple(anchors)
         }
-        print('anchors: %s' % (tuple(anchors)),))
+        print('anchors: %s' % (tuple(anchors),))
 
     if model_type == 'yolo_v2':
         model = make_serializable_object(
