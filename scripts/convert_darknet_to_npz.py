@@ -100,6 +100,8 @@ def load_darknet_model(filename, model_type, number_of_foreground_classes, retry
                 break
 
             if current.lstrip(' ').startswith('anchors'):
+                # Use only the line found first.
+                # For a YOLOv3 model, it should be fixed in future.
                 try:
                     anchor_info = [
                         float(s) for s
@@ -112,20 +114,24 @@ def load_darknet_model(filename, model_type, number_of_foreground_classes, retry
                     )
                     raise
                 break
-    overwritten_class_variables = None
-    if anchor_info != None:
-        assert(len(anchor_info) % 2 == 0)
-        anchors = []
-        for n in range(len(anchor_info) / 2):
-            width = anchor_info[2 * n]
-            height = anchor_info[2 * n + 1]
-            anchors.append((height, width))
-        overwritten_class_variables = {
-            '_anchors': tuple(anchors)
-        }
-        print('anchors: %s' % (tuple(anchors),))
+    #
+    print('anchors = %s' % (anchor_info,))
 
     if model_type == 'yolo_v2':
+        overwritten_class_variables = None
+        if anchor_info != None:
+            assert(len(anchor_info) % 2 == 0)
+            anchors = []
+            for n in range(len(anchor_info) / 2):
+                width = anchor_info[2 * n]
+                height = anchor_info[2 * n + 1]
+                anchors.append((height, width))
+            anchors = tuple(anchors)
+            overwritten_class_variables = {
+                '_anchors': anchors
+            }
+            print('anchors: %s' % (anchors,))
+
         model = make_serializable_object(
             chainercv.links.YOLOv2,
             constructor_args = {
@@ -134,6 +140,31 @@ def load_darknet_model(filename, model_type, number_of_foreground_classes, retry
             overwritten_class_variables = overwritten_class_variables
         )
     elif model_type == 'yolo_v3':
+        overwritten_class_variables = None
+        if anchor_info != None:
+            # Currently, the anchor information is generated from
+            # only the first line that includes 'anchors = ' in the
+            # cfg file.
+            # It may have to be fixed in future.
+            assert(len(anchor_info) % (2 * 3) == 0)
+            anchors = []
+            offset = 0
+            number_of_pairs = len(anchor_info) / 2
+            number_in_group = number_of_pairs / 3
+            for l in range(3):
+                anchors_in_group = []
+                offset = l * number_in_group * 2
+                for n in range(number_in_group):
+                    width = int(anchor_info[offset + 2 * n])
+                    height = int(anchor_info[offset + 2 * n + 1])
+                    anchors_in_group.append((height, width))
+                anchors.append(tuple(anchors_in_group))
+            anchors = tuple(reversed(anchors))
+            overwritten_class_variables = {
+                '_anchors': anchors
+            }
+            print('anchors: %s' % (anchors,))
+
         model = make_serializable_object(
             chainercv.links.YOLOv3,
             constructor_args = {
