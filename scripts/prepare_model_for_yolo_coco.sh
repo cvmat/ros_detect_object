@@ -49,7 +49,7 @@ rosrun detect_object convert_darknet_to_npz.py \
        --input_darknet_model yolov3.weights --input_darknet_cfg yolov3.cfg \
        --output ${DEST_DIR}/yolo-v3-coco.npz
 
-# Retrun to the original directory.
+# Return to the original directory.
 popd
 
 # Remove the temporary directory.
