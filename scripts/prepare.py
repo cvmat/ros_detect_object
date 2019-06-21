@@ -8,7 +8,14 @@ from chainercv.datasets import voc_bbox_label_names
 from chainer_npz_with_structure import make_serializable_object
 from chainer_npz_with_structure import save_npz_with_structure
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(
+        description="Prepare a NPZ file and a JSON file for 'detect.py'.",
+        epilog='''
+EXAMPLE:
+python prepare.py --model faster_rcnn --output_model faster-rcnn-vgg16-voc07.npz --output_json faster-rcnn-vgg16-voc07.json
+python prepare.py --model yolo_v2 --output_model yolov2.npz --output_json yolov2.json --pretrained_model voc0712
+'''
+)
 parser.add_argument('--model', choices=('faster_rcnn', 'yolo_v2', 'yolo_v3'),
                     default='faster_rcnn')
 parser.add_argument('--output_model', default='faster-rcnn-vgg16-voc07.npz')

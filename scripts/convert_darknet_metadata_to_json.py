@@ -10,7 +10,11 @@ class METADATA(ctypes.Structure):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Convert a metadata for Darknet into a JSON file.'
+        description="Convert a metadata for a darknet model into a JSON label file which can be used by 'detect.py' or 'detect_once.py'.",
+        epilog='''
+EXAMPLE:
+python convert_darknet_metadata_to_json.py --input_metadata cfg/coco.data --output_json coco.json
+'''
     )
     parser.add_argument('--darknet_library', default='libdarknet.so')
     parser.add_argument('--input_metadata', default='cfg/coco.data')

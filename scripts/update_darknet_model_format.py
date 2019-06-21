@@ -5,7 +5,11 @@ import sys
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description='Update format of a darknet model by loading/saving it.'
+        description='Update format of a darknet model by loading/saving it.',
+        epilog='''
+EXAMPLE:
+python update_darknet_model_format.py --input_model yolov2.weights --input_cfg yolov2.cfg --output_model yolov2_new.weights
+'''
     )
     parser.add_argument('--darknet_library', default='libdarknet.so')
     parser.add_argument('--input_model', default='yolov2.weights')

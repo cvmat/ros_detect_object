@@ -47,6 +47,9 @@ class image_converter:
         except cv_bridge.CvBridgeError as e:
             print(e)
 
+# Usage:
+# rosrun detect_object monitor_and_detect.py input:=/usb_cam/image_raw_throttle output:=/test
+#
 def main(args):
     print("Wait for the service 'detect_object'...")
     sys.stdout.flush()

@@ -234,7 +234,13 @@ def load_darknet_model(filename, model_type, number_of_foreground_classes, retry
     return model
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Convert a darknet model into a NPZ file which can be used by 'detect.py' or 'detect_once.py'.",
+        epilog='''
+EXAMPLE:
+python convert_darknet_to_npz.py --model yolo_v2 --n-fg-class 80 yolov2.weights yolov2.npz
+'''
+)
     parser.add_argument(
         '--model_type', choices=('yolo_v2', 'yolo_v3'),
         default='yolo_v2')

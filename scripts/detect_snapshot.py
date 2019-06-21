@@ -15,7 +15,13 @@ import util
 bridge = cv_bridge.CvBridge()
 
 def main():
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description='ROS client program for capturing an image and detecting objects in it.',
+        epilog='''
+EXAMPLE:
+rosrun detect_object detect_snapshot.py --input /camera/image --output output.png
+'''
+    )
     parser.add_argument('--detection_service_name', default='detect_object',
                         help = 'name of detection service')
     parser.add_argument('--output', default='output.png',

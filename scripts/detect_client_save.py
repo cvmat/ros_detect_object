@@ -22,7 +22,13 @@ def detect_object_client(detect_object_service, cv_image):
 
 filename = None
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description='ROS client program which detects objects in an image and saves the result as an image.',
+        epilog='''
+EXAMPLE:
+rosrun detect_object detect_client_save.py --input input.png --output output.png
+'''
+)
     parser.add_argument('--detection_service_name', default='detect_object',
                         help = 'name of detection service')
     parser.add_argument('--output', default='output.png',
