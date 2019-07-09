@@ -84,7 +84,7 @@ def _restore_obj_from_construction_info_string(str, class_name_replacement_list 
     elif str[0:3] == 'OBJ':
         import StringIO
         inp = StringIO.StringIO(str[3:])
-        info = numpy.load(inp).item()
+        info = numpy.load(inp, allow_pickle=True).item()
         inp.close()
         constructor_args = {}
         # Decode the encoded constructor arguments.
