@@ -32,8 +32,8 @@
 ----
 
 ## <a name="overview">Overview</a>
-This package includes 
-
+This package includes scripts for providing object detection services
+on ROS.
 
 ## <a name="requirements">Requirements</a>
 +   [Chainer](https://github.com/chainer/chainer)
