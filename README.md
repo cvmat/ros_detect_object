@@ -48,14 +48,19 @@ of YOLOv2, YOLOv3 and Faster R-CNN.
 +   [ChainerCV](https://github.com/chainer/chainercv)
 +   [OpenCV-Python](https://opencv.org/)
 +   [ROS cvbridge package](https://github.com/ros-perception/vision_opencv)
-+   A trained model and a label file.  
++   A trained model file and a label file.  
+    A trained model file is a NPZ file and a label file is a JSON file
+    which includes a map between a class name string and an integer
+    specifying the class.
+
     Scripts for providing ROS services in this package assumes that
     a file of a trained model has been saved by the function
     `save_npz_with_structure()` in
     [chainer\_npz\_with\_structure.py](scripts/chainer_npz_with_structure.py),
     which saves how to construct a model being saved as well as weights.
     Since the function encodes object construction and saves it into a file,
-    a model object can be loaded from the file without specifying its class.
+    a model object implemented by a newer class can be loaded from the file
+    without changing the scripts in this package.
     ([chainer.serializers.load_npz()](https://docs.chainer.org/en/stable/reference/generated/chainer.serializers.load_npz.html)
     requires to prepare a model object in a script before loading weights. )
 
