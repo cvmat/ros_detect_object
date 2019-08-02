@@ -10,7 +10,28 @@ if [ ! -z "$1" ]; then
     DARKNET_LIBRARY=$1
 fi
 
-echo "Use ${DARKNET_LIBRARY} as a library file of Darknet."
+echo "Use \"${DARKNET_LIBRARY}\" as a library file of Darknet."
+echo "Now try to import the library \"${DARKNET_LIBRARY}\"..."
+cat <<EOF | python -
+import ctypes
+import sys
+darknet_library = "${DARKNET_LIBRARY}"
+try:
+    lib = ctypes.CDLL(darknet_library, ctypes.RTLD_GLOBAL)
+except OSError as err:
+    print('OS error: %s' % (err,))
+    sys.exit(1)
+EOF
+if [ $? -eq 0 ]; then
+    echo "Succeeded to import the darknet library \"${DARKNET_LIBRARY}\"."
+else
+    echo "Failed to import the darknet library \"${DARKNET_LIBRARY}\"."
+    echo "A valid library name or a path should be given as an argument of this script."
+    exit 1
+fi
+
+echo
+echo "Download files related to pre-trained models..."
 
 BASENAME=${0##*/}
 
