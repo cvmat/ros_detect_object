@@ -22,8 +22,6 @@ pushd ${TMPDIR}
 mkdir -p cfg
 mkdir -p data
 wget -P cfg https://github.com/pjreddie/darknet/raw/master/cfg/coco.data
-wget -P data \
-     https://github.com/pjreddie/darknet/raw/master/data/coco_val_5k.list
 wget -P data https://github.com/pjreddie/darknet/raw/master/data/coco.names
 rosrun detect_object convert_darknet_metadata_to_json.py \
        --darknet_library ${DARKNET_LIBRARY} \
