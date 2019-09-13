@@ -35,8 +35,18 @@ def _convert_construction_info_to_string(obj):
     """
     if not hasattr(obj, '_constructor_args'):
         raise AttributeError('obj has no attribute _constructor_args.')
-    import StringIO
-    output = StringIO.StringIO()
+    output = None
+    prefix_str = 'STR'
+    prefix_obj = 'OBJ'
+    if six.PY2:
+        import StringIO
+        output = StringIO.StringIO()
+    elif six.PY3:
+        import io
+        output = io.BytesIO()
+        prefix_str = prefix_str.encode()
+        prefix_obj = prefix_obj.encode()
+    #
     info = {}
     info['_module_name'] = obj.__class__.__module__
     info['_class_name'] = obj.__class__.__name__
@@ -46,14 +56,14 @@ def _convert_construction_info_to_string(obj):
             encoded_constructor_args[k] \
                 = _convert_construction_info_to_string(v)
         elif isinstance(v, six.string_types):
-            encoded_constructor_args[k] = 'STR' + v
+            encoded_constructor_args[k] = prefix_str + v
         else:
             encoded_constructor_args[k] = v
     info['_encoded_constructor_args'] = encoded_constructor_args
     if hasattr(obj, '_overwritten_class_variables'):
         info['_overwritten_class_variables'] = obj._overwritten_class_variables
     numpy.save(output, arr=info)
-    encoded_construction_info = 'OBJ' + output.getvalue()
+    encoded_construction_info = prefix_obj + output.getvalue()
     output.close()
     return encoded_construction_info
 
@@ -79,17 +89,29 @@ def _restore_obj_from_construction_info_string(str, class_name_replacement_list 
     obj : object
         It is initialized according to the construction info.
     """
-    if str[0:3] == 'STR':
+    prefix_str = 'STR'
+    prefix_obj = 'OBJ'
+    if six.PY3:
+        prefix_str = prefix_str.encode()
+        prefix_obj = prefix_obj.encode()
+    #
+    if str[0:3] == prefix_str:
         obj = str[3:]
-    elif str[0:3] == 'OBJ':
-        import StringIO
-        inp = StringIO.StringIO(str[3:])
+    elif str[0:3] == prefix_obj:
+        inp = None
+        if six.PY2:
+            import StringIO
+            inp = StringIO.StringIO(str[3:])
+        elif six.PY3:
+            import io
+            inp = io.BytesIO(str[3:])
+        #
         info = numpy.load(inp, allow_pickle=True).item()
         inp.close()
         constructor_args = {}
         # Decode the encoded constructor arguments.
         for k, v in info['_encoded_constructor_args'].items():
-            if isinstance(v, six.string_types):
+            if isinstance(v, six.binary_type):
                 constructor_args[k] \
                     = _restore_obj_from_construction_info_string(
                         v, class_name_replacement_list)
