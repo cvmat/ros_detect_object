@@ -1,0 +1,3 @@
+scripts/*.json
+scripts/*.npz
+scripts/*.pyc
